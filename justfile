@@ -11,7 +11,7 @@ get-input:
 	curl -s \
 		-H "Cookie: session=$AOC_SESSION" \
 		"https://adventofcode.com/{{year}}/day/{{day}}/input" \
-		> "src/day$(printf "%02d" {{day}})/input.txt"
+		> "src/test/resources/day$(printf "%02d" {{day}})_input.txt"
 
 # Perform all verifications (compile, test, lint, etc.)
 verify:
