@@ -1,33 +1,33 @@
 import io.kotest.core.spec.style.FunSpec
 import org.amshove.kluent.shouldBeEqualTo
 
+private val EXAMPLE = """
+    1000
+    2000
+    3000
+
+    4000
+
+    5000
+    6000
+
+    7000
+    8000
+    9000
+
+    10000
+""".trimIndent()
+
+val INPUT = Day01Test::class.java.getResource("/day01_input.txt")?.readText().orEmpty().trim()
 
 class Day01Test : FunSpec({
     context("part 1") {
-
         test("should return expected output for the example") {
-            Day01.part1("""
-                1000
-                2000
-                3000
-        
-                4000
-        
-                5000
-                6000
-        
-                7000
-                8000
-                9000
-        
-                10000
-            """.trimIndent())
-                .shouldBeEqualTo(24_000)
+            Day01.part1(EXAMPLE) shouldBeEqualTo 24_000
         }
 
         test("should return expected output for the puzzle input") {
-            Day01.part1(Day01Test::class.java.getResource("/day01_input.txt")?.readText().orEmpty().trim())
-                .shouldBeEqualTo(69528)
+            Day01.part1(INPUT) shouldBeEqualTo 69528
         }
 
         listOf<Pair<String, Long>>(
@@ -45,28 +45,11 @@ class Day01Test : FunSpec({
     context("part 2") {
 
         test("should return expected output for the example") {
-            Day01.part2("""
-                1000
-                2000
-                3000
-        
-                4000
-        
-                5000
-                6000
-        
-                7000
-                8000
-                9000
-        
-                10000
-            """.trimIndent())
-                .shouldBeEqualTo(45_000)
+            Day01.part2(EXAMPLE) shouldBeEqualTo 45_000
         }
 
         test("should return expected output for the puzzle input") {
-            Day01.part2(Day01Test::class.java.getResource("/day01_input.txt")?.readText().orEmpty().trim())
-                .shouldBeEqualTo(206152)
+            Day01.part2(INPUT) shouldBeEqualTo 206152
         }
 
         listOf<Pair<String, Long>>(
