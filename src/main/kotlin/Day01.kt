@@ -6,5 +6,12 @@ object Day01 {
             }
             .max()
 
-    fun part2(input: String): Long = TODO()
+    fun part2(input: String): Long =
+        input.splitToSequence("\n\n")
+            .map { elf ->
+                elf.lineSequence().sumOf { it.toLong() }
+            }
+            .sortedDescending()
+            .take(3)
+            .sum()
 }
