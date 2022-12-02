@@ -48,22 +48,6 @@ class Day02Test : FunSpec({
         }
 
         listOf(
-            "A X" to "Z",
-            "A Y" to "X",
-            "A Z" to "Y",
-            "B X" to "X",
-            "B Y" to "Y",
-            "B Z" to "Z",
-            "C X" to "Y",
-            "C Y" to "Z",
-            "C Z" to "X"
-        ).forEach { (line, expectedValue) ->
-            test("whatToPlay($line) = $expectedValue") {
-                Day02.part2WhatToPlay(line) shouldBeEqualTo expectedValue
-            }
-        }
-
-        listOf(
             ((Play.Rock to Result.Lose) to Play.Scissors),
             ((Play.Paper to Result.Lose) to Play.Rock),
             ((Play.Scissors to Result.Lose) to Play.Paper),

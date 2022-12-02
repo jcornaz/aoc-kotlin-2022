@@ -1,57 +1,57 @@
-import com.sun.jdi.Value
-
 private const val WIN = 6
 private const val DRAW = 3
 private const val LOSS = 0
 
 object Day02 {
 
-    enum class Play(val symbol: String) {
-        Rock("A"),
-        Paper("B"),
-        Scissors("C"),
+    private val plays = Play.values().asSequence()
+    private val results = Result.values().asSequence()
+
+    enum class Play(val symbol: String, val score: Int) {
+        Rock("A", 1),
+        Paper("B", 2),
+        Scissors("C", 3),
     }
 
-    enum class Result(val symbol: String) {
-        Lose("X"),
-        Draw("Y"),
-        Win("Z"),
+    enum class Result(val symbol: String, val score: Int) {
+        Lose("X", 0),
+        Draw("Y", 3),
+        Win("Z", 6),
     }
 
-    fun part1(input: String): Int = input.lines().sumOf {
-        scoreOf(it)
-    }
+    fun part1(input: String): Int =
+        input.lines().sumOf(::part1ScoreOf)
 
     fun part2(input: String): Int =
-        input.lineSequence()
-            .map { "${it.first()} ${part2WhatToPlay(it)}" }
-            .sumOf { scoreOf(it) }
+        input.lineSequence().sumOf(::part2ScoreOf)
 
-    private fun scoreOf(line: String): Int = when (line) {
-        "A X" -> DRAW + 1
-        "A Y" -> WIN + 2
-        "A Z" -> LOSS + 3
-        "B X" -> LOSS + 1
-        "B Y" -> DRAW + 2
-        "B Z" -> WIN + 3
-        "C X" -> WIN + 1
-        "C Y" -> LOSS + 2
-        "C Z" -> DRAW + 3
-        else -> -1
-    }
+    private fun parsePlay(input: String): Play = plays.first { it.symbol == input }
+    private fun parseResult(input: String): Result = results.first { it.symbol == input }
 
-    fun part2WhatToPlay(line: String): String {
-        val (op, wanted) = line.split(" ")
-        val shouldPlay = whatToPlay(
-            Play.values().first { it.symbol == op },
-            Result.values().first { it.symbol == wanted }
+    private fun part1ScoreOf(line: String): Int {
+        val (opponent, me) = line.split(' ')
+        return score(
+            parsePlay(opponent),
+            when (me) {
+                "X" -> Play.Rock
+                "Y" -> Play.Paper
+                else -> Play.Scissors
+            }
         )
-        return when (shouldPlay) {
-            Play.Rock -> "X"
-            Play.Paper -> "Y"
-            Play.Scissors -> "Z"
-        }
     }
+
+    private fun part2ScoreOf(line: String): Int {
+        val (opponent, wanted) = line.split(' ')
+            .let { (op, wanted) -> parsePlay(op) to parseResult(wanted) }
+        val me = whatToPlay(opponent, wanted)
+        return wanted.score + me.score
+    }
+
+    private fun score(opponent: Play, me: Play): Int =
+        resultOf(opponent, me).score + me.score
+
+    private fun resultOf(opponent: Play, me: Play): Result =
+        results.first { whatToPlay(opponent, it) == me }
 
     fun whatToPlay(opponent: Play, wantedResult: Result): Play = when (wantedResult) {
         Result.Draw -> opponent
@@ -60,6 +60,6 @@ object Day02 {
             Play.Paper -> Play.Scissors
             Play.Scissors -> Play.Rock
         }
-        Result.Lose -> Play.values().first { whatToPlay(it, Result.Win) == opponent }
+        Result.Lose -> plays.first { whatToPlay(it, Result.Win) == opponent }
     }
 }
