@@ -7,18 +7,7 @@ B X
 C Z
 """.trimIndent()
 
-// A | X -> rock (1pt)
-// B | Y -> pap er (2pt)
-// C | Z -> scissors (3pt)
-
-// A Y   -> rock vs paper -> win (6) + paper (2) = 8
-// B X   -> paper vs rock -> loose (0) + paper (1) = 1
-// C Z   -> scissors vs scissors -> draw (3) + scissors (3) = 6
-
-private val INPUT_JONATHAN = Day02Test::class.java.getResource("/day02_input.txt")?.readText().orEmpty().trim()
-private val INPUT_MARKUS = Day02Test::class.java.getResource("/day02_msc.txt")?.readText().orEmpty().trim()
-private val INPUT_ALEX = Day02Test::class.java.getResource("/day02_ar.txt")?.readText().orEmpty().trim()
-private val INPUT_ZAYA = Day02Test::class.java.getResource("/day02_rk.txt")?.readText().orEmpty().trim()
+private val INPUT = Day02Test::class.java.getResource("/day02_input.txt")?.readText().orEmpty().trim()
 
 class Day02Test : FunSpec({
     context("part 1") {
@@ -27,11 +16,7 @@ class Day02Test : FunSpec({
         }
 
         test("should return expected output for the puzzle input") {
-            Day02.part1(INPUT_JONATHAN) shouldBeEqualTo 11841
-        }
-
-        test("should return expected output for the puzzle input") {
-            Day02.part1(INPUT_MARKUS) shouldBeEqualTo 8392
+            Day02.part1(INPUT) shouldBeEqualTo 11841
         }
 
         listOf(
@@ -56,14 +41,8 @@ class Day02Test : FunSpec({
             Day02.part2(EXAMPLE) shouldBeEqualTo 12
         }
 
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        test("should return expected output for Jonathan puzzle input") {
-            Day02.part2(INPUT_JONATHAN) shouldBeEqualTo 13022
-        }
-
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        test("should return expected output for Markus puzzle input") {
-            Day02.part2(INPUT_MARKUS) shouldBeEqualTo 10116
+        test("should return expected output for the puzzle input") {
+            Day02.part2(INPUT) shouldBeEqualTo 13022
         }
 
         listOf(

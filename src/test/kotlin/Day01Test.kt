@@ -18,7 +18,7 @@ private val EXAMPLE = """
     10000
 """.trimIndent()
 
-val INPUT = Day01Test::class.java.getResource("/day01_input.txt")?.readText().orEmpty().trim()
+private val INPUT = Day01Test::class.java.getResource("/day01_input.txt")?.readText().orEmpty().trim()
 
 class Day01Test : FunSpec({
     context("part 1") {
