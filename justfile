@@ -34,3 +34,20 @@ install-git-hooks:
 	echo '#!/usr/bin/env sh' > .git/hooks/pre-commit
 	echo 'just verify' >> .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
+
+# Reset all solutions
+@reset-all fromDay="1":
+    for d in $(seq {{fromDay}} 25); do \
+        just day=$d reset; \
+    done
+
+# Reset the current day solution
+@reset:
+    impl=Day$(printf "%02d" {{day}}); \
+    test=Day$(printf "%02d" {{day}})Test; \
+    cp src/main/kotlin/DayTemplate.kt src/main/kotlin/$impl.kt; \
+    cp src/test/kotlin/TestTemplate.kt src/test/kotlin/$test.kt; \
+    sed -i "s/\DayTemplate/$impl/" src/main/kotlin/$impl.kt; \
+    sed -i "s/DayTemplate/$impl/" src/test/kotlin/$test.kt; \
+    sed -i "s/TestTemplate/$test/" src/test/kotlin/$test.kt; \
+    sed -i "s/INPUT\.txt/day$(printf "%02d" {{day}})_input.txt/" src/test/kotlin/$test.kt
