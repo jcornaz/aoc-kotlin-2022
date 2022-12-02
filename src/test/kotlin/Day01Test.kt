@@ -64,9 +64,3 @@ class Day01Test : FunSpec({
         }
     }
 })
-
-data class TestCase(
-    val input: String,
-    val expectedOutput: Long,
-    val name: String? = null
-)
