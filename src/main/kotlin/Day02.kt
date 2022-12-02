@@ -1,16 +1,27 @@
+import com.sun.jdi.Value
+
 private const val WIN = 6
 private const val DRAW = 3
 private const val LOSS = 0
 
 object Day02 {
 
+    enum class Play(val symbol: String) {
+        Rock("A"),
+        Paper("B"),
+        Scissors("C"),
+    }
 
-    @Suppress("UNUSED_PARAMETER")
+    enum class Result(val symbol: String) {
+        Lose("X"),
+        Draw("Y"),
+        Win("Z"),
+    }
+
     fun part1(input: String): Int = input.lines().sumOf {
         scoreOf(it)
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun part2(input: String): Int =
         input.lineSequence()
             .map { "${it.first()} ${part2WhatToPlay(it)}" }
@@ -29,18 +40,26 @@ object Day02 {
         else -> -1
     }
 
-    fun part2WhatToPlay(line: String): String = when (line) {
-        "A X" -> "Z"
-        "A Y" -> "X"
-        "A Z" -> "Y"
-        "B X" -> "X"
-        "B Y" -> "Y"
-        "B Z" -> "Z"
-        "C X" -> "Y"
-        "C Y" -> "Z"
-        "C Z" -> "X"
-        else -> ""
+    fun part2WhatToPlay(line: String): String {
+        val (op, wanted) = line.split(" ")
+        val shouldPlay = whatToPlay(
+            Play.values().first { it.symbol == op },
+            Result.values().first { it.symbol == wanted }
+        )
+        return when (shouldPlay) {
+            Play.Rock -> "X"
+            Play.Paper -> "Y"
+            Play.Scissors -> "Z"
+        }
     }
 
-
+    fun whatToPlay(opponent: Play, wantedResult: Result): Play = when (wantedResult) {
+        Result.Draw -> opponent
+        Result.Win -> when (opponent) {
+            Play.Rock -> Play.Paper
+            Play.Paper -> Play.Scissors
+            Play.Scissors -> Play.Rock
+        }
+        Result.Lose -> Play.values().first { whatToPlay(it, Result.Win) == opponent }
+    }
 }

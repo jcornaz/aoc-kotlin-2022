@@ -1,5 +1,7 @@
 import io.kotest.core.spec.style.FunSpec
 import org.amshove.kluent.shouldBeEqualTo
+import Day02.Play
+import Day02.Result
 
 private val EXAMPLE = """
 A Y
@@ -58,6 +60,23 @@ class Day02Test : FunSpec({
         ).forEach { (line, expectedValue) ->
             test("whatToPlay($line) = $expectedValue") {
                 Day02.part2WhatToPlay(line) shouldBeEqualTo expectedValue
+            }
+        }
+
+        listOf(
+            ((Play.Rock to Result.Lose) to Play.Scissors),
+            ((Play.Paper to Result.Lose) to Play.Rock),
+            ((Play.Scissors to Result.Lose) to Play.Paper),
+            ((Play.Rock to Result.Win) to Play.Paper),
+            ((Play.Paper to Result.Win) to Play.Scissors),
+            ((Play.Scissors to Result.Win) to Play.Rock),
+            ((Play.Rock to Result.Draw) to Play.Rock),
+            ((Play.Scissors to Result.Draw) to Play.Scissors),
+            ((Play.Paper to Result.Draw) to Play.Paper),
+        ).forEach { (entry, shouldPlay) ->
+            val (opponentPlay, wantedResult) = entry
+            test("Must play $shouldPlay against $opponentPlay in order to $wantedResult") {
+                Day02.whatToPlay(opponentPlay, wantedResult) shouldBeEqualTo shouldPlay
             }
         }
     }
