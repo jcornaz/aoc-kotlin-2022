@@ -1,7 +1,3 @@
-private const val WIN = 6
-private const val DRAW = 3
-private const val LOSS = 0
-
 object Day02 {
 
     private val plays = Play.values().asSequence()
