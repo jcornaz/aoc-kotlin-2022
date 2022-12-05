@@ -3,22 +3,34 @@ import java.util.*
 object Day05 {
     // move 1 from 2 to 1
     fun part1(input: String): String {
-        val stacks = parseInitialState(input)
-        input.lines().dropWhile { it.isNotBlank() }.drop(1).forEach { instruction ->
-            val (n, _, from, _, to) = instruction.removePrefix("move ").split(" ")
-            repeat(n.toInt()) {
-                stacks[to.toInt() - 1].push(stacks[from.toInt() - 1].pop())
+        val stacks = input.initialState()
+        input.instructions().forEach { instruction ->
+            repeat(instruction.count) {
+                stacks[instruction.to].push(stacks[instruction.from].pop())
             }
         }
-
-        return stacks
-            .map { it.pop() }
-            .joinToString(separator = "")
+        return topOfStackToString(stacks)
     }
 
-    private fun parseInitialState(input: String): List<Stack<Char>> {
+    fun part2(input: String): String {
+        val stacks = input.initialState()
+        input.instructions().forEach { instruction ->
+            (1..instruction.count)
+                .map { stacks[instruction.from].pop() }
+                .reversed()
+                .forEach { stacks[instruction.to].push(it) }
+        }
+        return topOfStackToString(stacks)
+    }
+
+    private fun topOfStackToString(stacks: List<Stack<Char>>): String =
+        stacks
+            .map { it.pop() }
+            .joinToString(separator = "")
+
+    private fun String.initialState(): List<Stack<Char>> {
         val indices = generateSequence(1) { it + 4 }
-        val initialStateLines = input.lines().takeWhile { "1" !in it }
+        val initialStateLines = lines().takeWhile { "1" !in it }
         return indices
             .takeWhile { it < initialStateLines.first().length }
             .map { i ->
@@ -30,7 +42,15 @@ object Day05 {
             }.toList()
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun part2(input: String): Long = TODO()
+    private fun String.instructions(): Sequence<Instruction> =
+        lineSequence()
+            .dropWhile { it.isNotBlank() }
+            .drop(1)
+            .map {
+                val (n, _, from, _, to) = it.removePrefix("move ").split(" ")
+                Instruction(n.toInt(), from.toInt() - 1, to.toInt() - 1)
+            }
 
 }
+
+data class Instruction(val count: Int, val from: Int, val to: Int)
