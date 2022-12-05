@@ -1,7 +1,7 @@
 import java.util.*
 
 object Day05 {
-    // move 1 from 2 to 1
+
     fun part1(input: String): String {
         val stacks = input.initialState()
         input.instructions().forEach { instruction ->
