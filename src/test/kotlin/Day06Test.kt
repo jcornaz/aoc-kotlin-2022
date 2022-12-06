@@ -6,10 +6,11 @@ private val INPUT = Day06Test::class.java.getResource("/day06_input.txt")?.readT
 class Day06Test : FunSpec({
     context("part 1") {
         test("should return expected output for the puzzle input") {
-            Day06.part1(INPUT) shouldBeEqualTo 0
+            Day06.part1(INPUT) shouldBeEqualTo 1766
         }
 
         listOf(
+            "" to -1,
             "abcd" to 4,
             "abcde" to 4,
             "aabcde" to 5,
@@ -22,18 +23,13 @@ class Day06Test : FunSpec({
     }
 
     context("part 2") {
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the example") {
-            Day06.part2(EXAMPLE) shouldBeEqualTo 0
+        test("should return expected output for the puzzle input") {
+            Day06.part2(INPUT) shouldBeEqualTo 2383
         }
 
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the puzzle input") {
-            Day06.part2(INPUT) shouldBeEqualTo 0
-        }
-
-        listOf<Pair<String, Long>>(
-            // TODO Add more test cases here
+        listOf(
+            "mjqjpqmgbljsphdztnvjfqwrcgsmlb" to 19,
+            "bvwbjplbgvbhsrlpgdmjqwftvncz" to 23,
         ).forEach { (input, expectedOutput) ->
             test("part2(\"${input}\") = $expectedOutput") {
                 Day06.part2(input) shouldBeEqualTo expectedOutput
