@@ -31,12 +31,12 @@ private val INPUT = Day13Test::class.java.getResource("/day13_input.txt")?.readT
 
 class Day13Test : FunSpec({
     context("part 1") {
-        xtest("should return expected output for the example") {
+        test("should return expected output for the example") {
             Day13.part1(EXAMPLE) shouldBeEqualTo 13
         }
 
-        xtest("should return expected output for the puzzle input") {
-            Day13.part1(INPUT) shouldBeEqualTo 0
+        test("should return expected output for the puzzle input") {
+            Day13.part1(INPUT) shouldBeEqualTo 5580
         }
 
         listOf(
@@ -44,7 +44,7 @@ class Day13Test : FunSpec({
             ("[2]" to "[1]") to false,
             ("[1,2]" to "[2,3]") to true,
             ("[1]" to "[2,3]") to true,
-            ("[1,2]" to "[2]") to false,
+            ("[1,2]" to "[2]") to true,
             ("[3,2]" to "[2]") to false,
             ("[1]" to "[[2]]") to true,
             ("[[1]]" to "[2]") to true,
@@ -53,8 +53,9 @@ class Day13Test : FunSpec({
             ("[]" to "[[]]") to true,
             ("[1,1,3,1,1]" to "[1,1,5,1,1]") to true,
             ("[[4,4],4,4]" to "[[4,4],4,4,4]") to true,
+           // ("[[1],[2,3,4]]" to "[[1],4]") to true,
         ).forEach { (input, expectedOutput) ->
-            test("isInRightOrder($input) = $expectedOutput") {
+            test("isInRightOrder(${input.first},${input.second}) = $expectedOutput") {
                 Day13.isInCorrectOrder(input.first, input.second) shouldBeEqualTo expectedOutput
             }
         }
