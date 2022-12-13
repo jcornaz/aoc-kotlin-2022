@@ -55,7 +55,7 @@ class Day13Test : FunSpec({
             // ("[[4,4],4,4]" to "[[4,4],4,4,4]") to true,
         ).forEach { (input, expectedOutput) ->
             test("isInRightOrder($input) = $expectedOutput") {
-                Day13.isInCorrectOrder(input) shouldBeEqualTo expectedOutput
+                Day13.isInCorrectOrder(input.first, input.second) shouldBeEqualTo expectedOutput
             }
         }
     }
