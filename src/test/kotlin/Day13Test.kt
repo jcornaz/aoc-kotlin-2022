@@ -62,22 +62,12 @@ class Day13Test : FunSpec({
     }
 
     context("part 2") {
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the example") {
-            Day13.part2(EXAMPLE) shouldBeEqualTo 0
+        test("should return expected output for the example") {
+            Day13.part2(EXAMPLE) shouldBeEqualTo 140
         }
 
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the puzzle input") {
-            Day13.part2(INPUT) shouldBeEqualTo 0
-        }
-
-        listOf<Pair<String, Long>>(
-            // TODO Add more test cases here
-        ).forEach { (input, expectedOutput) ->
-            test("part2(\"${input}\") = $expectedOutput") {
-                Day13.part2(input) shouldBeEqualTo expectedOutput
-            }
+        test("should return expected output for the puzzle input") {
+            Day13.part2(INPUT) shouldBeEqualTo 26200
         }
     }
 })

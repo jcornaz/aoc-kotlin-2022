@@ -3,14 +3,24 @@ import java.lang.StringBuilder
 object Day13 {
 
     fun part1(input: String): Int =
-        input.trim().split("\n\n").map { it.trim() }.withIndex()
+        input.split("\n\n").withIndex()
             .filter { (_, both) ->
                 isInCorrectOrder(both.lines().first(), both.lines().last())!!
             }
             .sumOf { it.index + 1 }
 
     @Suppress("UNUSED_PARAMETER")
-    fun part2(input: String): Long = TODO()
+    fun part2(input: String): Int {
+        val dividers = listOf("[[2]]", "[[6]]")
+        val sorted = (input.lines() + dividers)
+            .filter { it.isNotBlank() }
+            .sortedWith { left, right ->
+                isInCorrectOrder(left, right)
+                    ?.let { if (it) -1 else 1 }
+                    ?: 0
+            }
+        return dividers.map { sorted.indexOf(it) + 1 }.fold(1) { a, b -> a * b }
+    }
 
     fun isInCorrectOrder(left: String, right: String): Boolean? {
         return if (left.startsWith("[") || right.startsWith("[")) {
@@ -22,7 +32,6 @@ object Day13 {
             isInCorrectOrder(leftArray.size, rightArray.size)
         } else {
             isInCorrectOrder(left.toInt(), right.toInt())
-
         }
     }
 
