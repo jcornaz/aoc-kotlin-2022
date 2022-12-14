@@ -113,12 +113,6 @@ class Day14Test : FunSpec({
             val cave = Cave.buildCave("1,1")
             cave.dropSand().shouldBeNull()
         }
-
-        xtest("should fail if the input for the cave is wrong") {
-            assertFails {
-                Cave.buildCave("2,0 -> 3,2")
-            }
-        }
     }
 
     context("part 2") {

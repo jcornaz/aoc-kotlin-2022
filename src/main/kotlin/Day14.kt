@@ -1,99 +1,76 @@
+import kotlin.properties.Delegates
+
 object Day14 {
 
-    fun part1(input: String): Long {
-        val sequence = generateSequence(Cave.buildCave(input)) {
-            if (it.dropSand() != null) it else null
-        }
-        return sequence.count().toLong() - 1
-    }
+    fun part1(input: String): Long =
+        Cave.buildCave(input).countDrops() - 1
 
-    fun part2(input: String): Long {
-        val cave = Cave.buildCave(input)
-        cave.addFloor()
-        val sequence = generateSequence(cave) {
+    fun part2(input: String): Long =
+        Cave.buildCave(input).apply {
+            floor = true
+        }.countDrops()
+
+    private fun Cave.countDrops(): Long {
+        val sequence = generateSequence(this) {
             if (it.dropSand() != null) it else null
         }
         return sequence.count().toLong()
     }
 
-    class Cave private constructor(private val blockedSpaces : MutableSet<Position>) {
+    class Cave private constructor(private val blocked: MutableSet<Position>) {
+        var floor: Boolean by Delegates.observable(false) { _, _, _ -> maxY += 2 }
+        private var maxY = blocked.maxOf { it.y }
 
-        private var floor: Int? = null
-
-        private val _maxY = blockedSpaces.maxOf { it.y }
-        private val maxY get() = floor ?: _maxY
-
-        fun addFloor() {
-            floor = _maxY + 2
-        }
-
-        override fun toString(): String {
-            val xRange = blockedSpaces.minOf { it.x }..blockedSpaces.maxOf { it.x }
-            val yRange = blockedSpaces.minOf { it.y }..maxY
-            for (y in yRange) {
-                for (x in xRange) {
-                    print(if (isBlocked(x, y)) '#' else ' ')
-                }
-                println()
-            }
-            return super.toString()
-        }
-
-        fun dropSand(): Position? {
-
-            return generateSequence(START_POSITION) { it.getNextPosition() }
+        fun dropSand(): Position? =
+            generateSequence(START_POSITION) { it.nextPosition }
                 .takeWhile { it.y <= maxY }
                 .last()
                 .takeIf { it.y < maxY && it != START_POSITION }
-                ?.also { blockedSpaces.add(it) }
-        }
+                ?.also { blocked.add(it) }
 
-
-        private fun Position.getNextPosition(): Position? {
-            if (!isBlocked(x, y + 1)) return Position(x, y + 1)
-            if (!isBlocked(x - 1, y + 1)) return Position(x - 1, y + 1)
-            if (!isBlocked(x + 1, y + 1)) return Position(x + 1, y + 1)
-            return null
-        }
+        private val Position.nextPosition: Position?
+            get() =
+                moves
+                    .map { (dx, dy) -> Position(x + dx, y + dy) }
+                    .firstOrNull { (x, y) -> !isBlocked(x, y) }
 
         fun isBlocked(x: Int, y: Int): Boolean {
-            floor?.let { if (y >= it) return true }
-            return Position(x, y) in blockedSpaces
+            if (floor && y >= maxY) return true
+            return Position(x, y) in blocked
         }
 
         companion object {
             private val START_POSITION = Position(500, 0)
+            private val moves = sequenceOf(0 to 1, -1 to 1, 1 to 1)
 
-            fun buildCave(input: String): Cave {
-                val set = mutableSetOf<Position>()
-                input.lines().forEach { line ->
-                    line.split(" -> ")
-                        .map {
-                            val (x, y) = it.split(",")
-                            Position(x.toInt(), y.toInt())
-                        }
-                        .fold<Position, Position?>(null) { prev, next ->
-                            if (prev == null) {
-                                set.add(next)
-                                next
-                            } else {
-                                if (prev.x != next.x) {
-                                    for (x in minOf( prev.x, next.x)..maxOf( prev.x, next.x)) {
-                                        set.add(Position(x, next.y))
-                                    }
-                                } else {
-                                    for (y in minOf( prev.y, next.y)..maxOf( prev.y, next.y)) {
-                                        set.add(Position(next.x, y))
-                                    }
-                                }
+            fun buildCave(input: String): Cave =
+                input.lineSequence()
+                    .fold(mutableSetOf<Position>()) { blocked, line ->
+                        line.split(" -> ")
+                            .map(Position::parse)
+                            .fold<Position, Position?>(null) { prev, next ->
+                                blocked.addAll(if (prev == null) sequenceOf(next) else line(prev, next))
                                 next
                             }
-                        }
+                        blocked
+                    }
+                    .let { Cave(it) }
+
+            private fun line(from: Position, to: Position): Sequence<Position> =
+                if (from.x != to.x) {
+                    (minOf(from.x, to.x)..maxOf(from.x, to.x)).asSequence().map { Position(it, to.y) }
+                } else {
+                    (minOf(from.y, to.y)..maxOf(from.y, to.y)).asSequence().map { Position(to.x, it) }
                 }
-                return Cave(set)
-            }
         }
     }
 
-    data class Position(val x: Int, val y: Int)
+    data class Position(val x: Int, val y: Int) {
+        companion object {
+            fun parse(input: String): Position {
+                val (x, y) = input.split(",")
+                return Position(x.toInt(), y.toInt())
+            }
+        }
+    }
 }
