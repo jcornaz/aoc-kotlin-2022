@@ -95,7 +95,7 @@ class Day14Test : FunSpec({
         }
 
         listOf(
-            Triple("400,1 -> 600,1", 1, listOf(500 to 0)),
+            Triple("400,2 -> 600,2", 1, listOf(500 to 1)),
             Triple("400,2 -> 600,2", 1, listOf(500 to 1)),
             Triple("400,2 -> 600,2", 2, listOf(500 to 1, 499 to 1)),
             Triple("400,2 -> 600,2", 3, listOf(500 to 1, 499 to 1, 501 to 1)),
@@ -122,22 +122,12 @@ class Day14Test : FunSpec({
     }
 
     context("part 2") {
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the example") {
-            Day14.part2(EXAMPLE) shouldBeEqualTo 0
+        test("should return expected output for the example") {
+            Day14.part2(EXAMPLE) shouldBeEqualTo 93
         }
 
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the puzzle input") {
-            Day14.part2(INPUT) shouldBeEqualTo 0
-        }
-
-        listOf<Pair<String, Long>>(
-            // TODO Add more test cases here
-        ).forEach { (input, expectedOutput) ->
-            test("part2(\"${input}\") = $expectedOutput") {
-                Day14.part2(input) shouldBeEqualTo expectedOutput
-            }
+        test("should return expected output for the puzzle input") {
+            Day14.part2(INPUT) shouldBeEqualTo 24166
         }
     }
 })
