@@ -1,30 +1,36 @@
 object Day14 {
 
     fun part1(input: String): Long {
-        println(input)
-        val cave = Cave.buildCave(input)
-        var counter = 0L
-        while (cave.dropSand() != null) counter++
-        return counter
-        return counter
+        val sequence = generateSequence(Cave.buildCave(input)) {
+            if (it.dropSand() != null) it else null
+        }
+        return sequence.count().toLong() - 1
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun part2(input: String): Long = TODO()
 
-
-    // val cave: Cave = Day14.buildCave("2,0")
-
     class Cave private constructor(private val blockedSpaces : MutableSet<Position>) {
 
-        private val max = blockedSpaces.maxBy { it.y }.y
+        private val maxY = blockedSpaces.maxOf { it.y }
+
+        override fun toString(): String {
+            val xRange = blockedSpaces.minOf { it.x }..blockedSpaces.maxOf { it.x }
+            val yRange = blockedSpaces.minOf { it.y }..maxY
+            for (y in yRange) {
+                for (x in xRange) {
+                    print(if (isBlocked(x, y)) '#' else ' ')
+                }
+                println()
+            }
+            return super.toString()
+        }
 
         fun dropSand(): Position? {
-            println(blockedSpaces)
             return generateSequence(Position(500, 0)) { it.getNextPosition() }
-                .takeWhile { it.y <= max }
+                .takeWhile { it.y <= maxY }
                 .last()
-                .takeIf { it.y < max }
+                .takeIf { it.y < maxY }
                 ?.also { blockedSpaces.add(it) }
         }
 
@@ -62,7 +68,7 @@ object Day14 {
                                         set.add(Position(next.x, y))
                                     }
                                 }
-                                prev
+                                next
                             }
                         }
                 }

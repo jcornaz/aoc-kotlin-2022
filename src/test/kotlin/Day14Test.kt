@@ -12,13 +12,23 @@ private val INPUT = Day14Test::class.java.getResource("/day14_input.txt")?.readT
 
 class Day14Test : FunSpec({
     context("part 1") {
-        xtest("should return expected output for the example") {
+        test("should return expected output for the example") {
             Day14.part1(EXAMPLE) shouldBeEqualTo 24
         }
 
-        // TODO Set the expected value and enable the test by removing the 'x' prefix
-        xtest("should return expected output for the puzzle input") {
-            Day14.part1(INPUT) shouldBeEqualTo 0
+        test("should return expected output for the puzzle input") {
+            Day14.part1(INPUT) shouldBeEqualTo 793
+        }
+
+        listOf(
+            "1,1" to 0L,
+            "499,2 -> 501,2" to 1L,
+            "498,10 -> 502,10" to 4L,
+            "497,10 -> 503,10" to 9L,
+        ).forEach { (input, expected) ->
+            test("part1($input) = $expected") {
+                Day14.part1(input).shouldBeEqualTo(expected)
+            }
         }
 
         test("should detect obstacle") {
@@ -77,6 +87,11 @@ class Day14Test : FunSpec({
             cave.isBlocked(12, 0).shouldBeTrue()
             cave.isBlocked(12, 1).shouldBeTrue()
             cave.isBlocked(12, 2).shouldBeTrue()
+        }
+
+        test("should detect obstacles in example") {
+            val cave: Cave = Cave.buildCave(EXAMPLE)
+            cave.isBlocked(502, 5).shouldBeTrue()
         }
 
         listOf(
