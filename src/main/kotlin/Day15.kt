@@ -1,4 +1,3 @@
-import javax.swing.text.Position
 import kotlin.math.abs
 
 object Day15 {
@@ -21,25 +20,30 @@ object Day15 {
 
     fun numberOfNonBeacon(input: String, y: Int): Int {
         val search = Search(input)
-        val minX = search.sensors.minOf { it.minX }
-        val maxX = search.sensors.maxOf { it.maxX }
-        return (minX..maxX)
-            .asSequence()
-            .map { Position(it, y) }
-            .count { it !in search.beacons && !search.canBeDistressBeacon(it) }
+        val searchRange = search.minX..search.maxX
+        val uncovered = search.uncoveredRange(y, search.minX..search.maxX)
+        return searchRange.size - uncovered.size - search.beacons.count { it.y == y }
     }
 
-    class Search(input: String) {
+    private class Search(input: String) {
         val beacons = mutableSetOf<Position>()
-        val sensors = input.lines()
+        private val sensors = input.lines()
             .map {
                 val (sensorPosition, beaconPosition) = parseLine(it)
                 beacons.add(beaconPosition)
                 Sensor(sensorPosition, sensorPosition.distanceTo(beaconPosition))
             }
 
+        val minX get() = sensors.minOf { it.minX }
+        val maxX get() = sensors.maxOf { it.maxX }
+
+        fun uncoveredRange(y: Int, range: IntRange): SearchRange =
+            sensors.fold(SearchRange(range)) { range, sensor ->
+                sensor.coverage(y)?.let(range::remove) ?: range
+            }
+
         fun canBeDistressBeacon(position: Position): Boolean =
-            sensors.none { sensor -> sensor.isWithinRange(position) }
+            sensors.none { position in it }
     }
 
     private fun parseLine(line: String): Pair<Position, Position> {
@@ -47,16 +51,46 @@ object Day15 {
         return Position(sx.toInt(), sy.toInt()) to Position(bx.toInt(), by.toInt())
     }
 
-    data class Position(val x: Int, val y: Int) {
+    private data class Position(val x: Int, val y: Int) {
         fun distanceTo(other: Position): Int {
             return abs(x - other.x) + abs(y - other.y)
         }
     }
 
-    data class Sensor(val position: Position, val range: Int) {
+    private data class Sensor(val position: Position, val range: Int) {
         val minX = position.x - range
         val maxX = position.x + range
-        fun isWithinRange(otherPosition: Position) = position.distanceTo(otherPosition) <= range
+
+        operator fun contains(otherPosition: Position) =
+            coverage(otherPosition.y)?.let { otherPosition.x in it } ?: false
+
+        fun coverage(y: Int): IntRange? {
+            val vDist = abs(y - position.y)
+            if (vDist > range) return null
+            val extent = range - vDist
+            return (position.x - extent)..(position.x + extent)
+        }
     }
 
+    private class SearchRange private constructor(val ranges: List<IntRange>) {
+        constructor(range: IntRange) : this(listOf(range))
+
+        val size: Int get() = ranges.sumOf { it.size }
+
+        fun remove(range: IntRange): SearchRange {
+            if (ranges.isEmpty()) return this
+            return SearchRange(ranges.flatMap { it.remove(range) }.also { println("remove $range -> $it") })
+        }
+
+        private fun IntRange.remove(other: IntRange): List<IntRange> = buildList {
+            (first .. minOf(other.first - 1, last))
+                .takeUnless { it.isEmpty() }
+                ?.let(::add)
+            (maxOf(other.last + 1, first)..endInclusive)
+                .takeUnless { it.isEmpty() }
+                ?.let(::add)
+        }
+    }
+
+    val IntRange.size: Int get() = last - first + 1
 }

@@ -30,10 +30,6 @@ class Day15Test : FunSpec({
             Day15.part1(INPUT) shouldBeEqualTo 4560025
         }
 
-        ///
-        ///    S   SB
-        ///   ###  #
-        ///    B
         listOf(
             ("Sensor at x=0, y=0: closest beacon is at x=2, y=0" to 0) to 4,
             ("Sensor at x=0, y=0: closest beacon is at x=-2, y=0" to 0) to 4,
