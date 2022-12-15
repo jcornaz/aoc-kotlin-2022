@@ -1,15 +1,35 @@
+import javax.swing.text.Position
 import kotlin.math.abs
 
 object Day15 {
 
     fun part1(input: String): Long = numberOfNonBeacon(input, 2000000).toLong()
 
-    @Suppress("UNUSED_PARAMETER")
-    fun part2(input: String): Long = TODO()
+    fun part2(input: String, searchScope: Int): Int {
+        val search = Search(input)
+        for (x in 0..searchScope) {
+            for (y in 0..searchScope) {
+                val distressBeacon = Position(x, y)
+                if (search.canBeDistressBeacon(distressBeacon))
+                    return distressBeacon.x * 4_000_000 + distressBeacon.y
+            }
+        }
+        return -1
+    }
 
     private val LINE_REGEX = Regex("Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at x=(-?\\d+), y=(-?\\d+)")
 
     fun numberOfNonBeacon(input: String, y: Int): Int {
+        val search = Search(input)
+        val minX = search.sensors.minOf { it.minX }
+        val maxX = search.sensors.maxOf { it.maxX }
+        return (minX..maxX)
+            .asSequence()
+            .map { Position(it, y) }
+            .count { it !in search.beacons && !search.canBeDistressBeacon(it) }
+    }
+
+    class Search(input: String) {
         val beacons = mutableSetOf<Position>()
         val sensors = input.lines()
             .map {
@@ -17,11 +37,9 @@ object Day15 {
                 beacons.add(beaconPosition)
                 Sensor(sensorPosition, sensorPosition.distanceTo(beaconPosition))
             }
-        val minX = sensors.minOf { it.minX }
-        val maxX = sensors.maxOf { it.maxX }
-        return (minX..maxX)
-            .map { Position(it, y) }
-            .count { it !in beacons && sensors.any { sensor -> sensor.isWithinRange(it) } }
+
+        fun canBeDistressBeacon(position: Position): Boolean =
+            sensors.none { sensor -> sensor.isWithinRange(position) }
     }
 
     private fun parseLine(line: String): Pair<Position, Position> {
