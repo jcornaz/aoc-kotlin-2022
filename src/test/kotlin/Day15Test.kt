@@ -50,8 +50,8 @@ class Day15Test : FunSpec({
             Day15.part2(EXAMPLE, 20) shouldBeEqualTo 56000011
         }
 
-        xtest("should return expected output for the puzzle input") {
-            Day15.part2(INPUT, 4000000) shouldBeEqualTo 0
+        test("should return expected output for the puzzle input") {
+            Day15.part2(INPUT, 4000000) shouldBeEqualTo 12480406634249
         }
     }
 })

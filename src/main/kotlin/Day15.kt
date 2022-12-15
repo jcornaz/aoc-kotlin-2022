@@ -4,16 +4,15 @@ object Day15 {
 
     fun part1(input: String): Long = numberOfNonBeacon(input, 2000000).toLong()
 
-    fun part2(input: String, searchScope: Int): Int {
+    fun part2(input: String, searchScope: Int): Long {
         val search = Search(input)
-        for (x in 0..searchScope) {
-            for (y in 0..searchScope) {
-                val distressBeacon = Position(x, y)
-                if (search.canBeDistressBeacon(distressBeacon))
-                    return distressBeacon.x * 4_000_000 + distressBeacon.y
-            }
-        }
-        return -1
+        val beacon = (0..searchScope)
+            .asSequence()
+            .map { y -> y to search.uncoveredRange(y, 0..searchScope) }
+            .first { (_, range) -> range.size > 0 }
+            .let { (y, range) -> range.asSequence().map { Position(it, y) } }
+            .first()
+        return beacon.x.toLong() * 4_000_000 + beacon.y.toLong()
     }
 
     private val LINE_REGEX = Regex("Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at x=(-?\\d+), y=(-?\\d+)")
@@ -77,9 +76,11 @@ object Day15 {
 
         val size: Int get() = ranges.sumOf { it.size }
 
+        fun asSequence() = ranges.asSequence().flatMap { it.asSequence() }
+
         fun remove(range: IntRange): SearchRange {
             if (ranges.isEmpty()) return this
-            return SearchRange(ranges.flatMap { it.remove(range) }.also { println("remove $range -> $it") })
+            return SearchRange(ranges.flatMap { it.remove(range) })
         }
 
         private fun IntRange.remove(other: IntRange): List<IntRange> = buildList {
