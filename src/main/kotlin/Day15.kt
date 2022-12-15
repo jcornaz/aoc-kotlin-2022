@@ -5,10 +5,10 @@ object Day15 {
     fun part1(input: String): Long = numberOfNonBeacon(input, 2000000).toLong()
 
     fun part2(input: String, searchScope: Int): Long {
-        val search = Search(input)
+        val scan = Scan.parse(input)
         val beacon = (0..searchScope)
             .asSequence()
-            .map { y -> y to search.uncoveredRange(y, 0..searchScope) }
+            .map { y -> y to scan.uncoveredRange(y, 0..searchScope) }
             .first { (_, range) -> range.size > 0 }
             .let { (y, range) -> range.asSequence().map { Position(it, y) } }
             .first()
@@ -18,31 +18,35 @@ object Day15 {
     private val LINE_REGEX = Regex("Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at x=(-?\\d+), y=(-?\\d+)")
 
     fun numberOfNonBeacon(input: String, y: Int): Int {
-        val search = Search(input)
-        val searchRange = search.minX..search.maxX
-        val uncovered = search.uncoveredRange(y, search.minX..search.maxX)
-        return searchRange.size - uncovered.size - search.beacons.count { it.y == y }
+        val scan = Scan.parse(input)
+        val searchRange = scan.minX..scan.maxX
+        val uncovered = scan.uncoveredRange(y, scan.minX..scan.maxX)
+        return searchRange.size - uncovered.size - scan.beacons.count { it.y == y }
     }
 
-    private class Search(input: String) {
-        val beacons = mutableSetOf<Position>()
-        private val sensors = input.lines()
-            .map {
-                val (sensorPosition, beaconPosition) = parseLine(it)
-                beacons.add(beaconPosition)
-                Sensor(sensorPosition, sensorPosition.distanceTo(beaconPosition))
-            }
+    private class Scan private constructor(val beacons: Set<Position>, private val sensors: List<Sensor>) {
 
         val minX get() = sensors.minOf { it.minX }
         val maxX get() = sensors.maxOf { it.maxX }
 
-        fun uncoveredRange(y: Int, range: IntRange): SearchRange =
-            sensors.fold(SearchRange(range)) { range, sensor ->
+        fun uncoveredRange(y: Int, initialRange: IntRange): SearchRange =
+            sensors.fold(SearchRange(initialRange)) { range, sensor ->
                 sensor.coverage(y)?.let(range::remove) ?: range
             }
 
-        fun canBeDistressBeacon(position: Position): Boolean =
-            sensors.none { position in it }
+        companion object {
+            fun parse(input: String): Scan {
+                val beacons = mutableSetOf<Position>()
+                val sensors = mutableListOf<Sensor>()
+                input.lineSequence()
+                    .forEach { line ->
+                        val (sensorPosition, beaconPosition) = parseLine(line)
+                        beacons.add(beaconPosition)
+                        sensors.add(Sensor(sensorPosition, sensorPosition.distanceTo(beaconPosition)))
+                    }
+                return Scan(beacons, sensors)
+            }
+        }
     }
 
     private fun parseLine(line: String): Pair<Position, Position> {
