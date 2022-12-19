@@ -10,7 +10,7 @@ object Day16 {
         val valves = input.lineSequence()
             .map(::parseValve)
             .toMap()
-        val solver = Solver(maxStep = time, initialState = SearchState(valves.keys.first(), valves.mapValues { false }, 0), valves = valves)
+        val solver = Solver(maxStep = time, initialState = SearchState(valves.keys.first(), valves.mapValues { false }, 0, null), valves = valves)
         return solver.solve()
     }
 
@@ -25,7 +25,7 @@ object Day16 {
 
     data class Valve(val rate: Int, val connections: Collection<ValveId>)
 
-    class SearchState(val valve: ValveId, val openValves: Map<ValveId, Boolean>, val step: Int) {
+    class SearchState(val valve: ValveId, val openValves: Map<ValveId, Boolean>, val step: Int, val parent: SearchState?) {
 
         override fun equals(other: Any?): Boolean {
             if (other !is SearchState) return false
@@ -33,6 +33,8 @@ object Day16 {
         }
 
         override fun hashCode(): Int = valve.hashCode() + 31 * openValves.hashCode()
+
+        override fun toString(): String = "$valve at $step (${openValves.filterValues { it }.keys})"
     }
 
     class Solver(val maxStep: Int, private val initialState: SearchState, private val valves: Map<ValveId, Valve>) {
@@ -48,11 +50,11 @@ object Day16 {
 
             val nextStep = searchState.step + 1
             val connectedStates = currentValve.connections.asSequence().map {
-                SearchState(it, searchState.openValves, nextStep) to score
+                SearchState(it, searchState.openValves, nextStep, searchState) to score
             }
 
             return if(searchState.openValves[searchState.valve] == false && currentValve.rate != 0)
-                connectedStates + (SearchState(searchState.valve, searchState.openValves + (searchState.valve to true), nextStep) to computeScore(score, nextStep, currentValve.rate))
+                connectedStates + (SearchState(searchState.valve, searchState.openValves + (searchState.valve to true), nextStep, searchState.parent) to computeScore(score, nextStep, currentValve.rate))
             else
                 connectedStates
         }
@@ -72,6 +74,15 @@ object Day16 {
                     .filter { it.first !in visitedStates }
                     .forEach { priorityQueue.add(it) }
             }
+
+            val seq = sequence {
+                var currentState: SearchState = bestStateThusFar.first
+                while (currentState.parent != null) {
+                    yield(currentState)
+                    currentState = currentState.parent!!
+                }
+            }
+            seq.toList().reversed().forEach(::println)
 
             return bestStateThusFar.second
         }
