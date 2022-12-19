@@ -27,11 +27,39 @@ class Day16Test : FunSpec({
             Day16.part1(INPUT) shouldBeEqualTo 0
         }
 
-        listOf<Pair<String, Long>>(
-            // TODO Add more test cases here
+        listOf(
+            """
+                Valve AA has flow rate=0; tunnels lead to valves BB
+                Valve BB has flow rate=13; tunnels lead to valves AA
+            """.trimIndent() to (13*28),
+            """
+                Valve AA has flow rate=0; tunnels lead to valves BB, CC
+                Valve BB has flow rate=13; tunnels lead to valves CC, AA
+                Valve CC has flow rate=2; tunnels lead to valves AA, BB
+            """.trimIndent() to ((13*28) + (2*26)),
+            """
+                Valve AA has flow rate=0; tunnels lead to valves BB, CC
+                Valve BB has flow rate=13; tunnels lead to valves AA
+                Valve CC has flow rate=2; tunnels lead to valves BB
+            """.trimIndent() to ((13*28) + (2*25)),
         ).forEach { (input, expectedOutput) ->
             test("part1(\"${input}\") = $expectedOutput") {
                 Day16.part1(input) shouldBeEqualTo expectedOutput
+            }
+        }
+
+
+        listOf(
+            1 to 0,
+            2 to 0,
+            3 to 20,
+            4 to 40,
+            5 to 63,
+            6 to 93,
+            // 30 to 1651,
+        ).forEach { (time, expectedOutput) ->
+            test("part1(EXAMPLE, $time) = $expectedOutput") {
+                Day16.part1(EXAMPLE, time) shouldBeEqualTo expectedOutput
             }
         }
     }
